@@ -29,15 +29,21 @@ input reset, // Used for initializing at zero
 output reg [7:0]hours,
 output reg [7:0]minutes,
 output reg [7:0]seconds
-
+// outputs answer in BCD; uncomment lines 29-31 for 8-bit output
+/*
+output [3:0]hoursTens,
+output [3:0]hoursOnes,
+output [3:0]minutesTens,
+output [3:0]minutesOnes,
+output [3:0]secondsTens,
+output [3:0]secondsOnes
+*/
     );
-    //reg test;
-   // reg [7:0]workingSeconds;
-   // reg [7:0]workingMinutes;
-   // reg [7:0]workingHours;
-    // Make initial values zeroes
-    
-        
+   /* 
+   reg [7:0]seconds;
+   reg [7:0]minutes;
+   reg [7:0]hours;
+   */     
     // counts until 24:60:60
     // 8 bit in/out so it's compatible with the ALU
     // Eventually, this is going to use the add 1 function from the ALU. Until then, I'm just adding one so we have 
@@ -48,6 +54,7 @@ output reg [7:0]seconds
     // https://riptutorial.com/verilog/example/8307/simple-counter
 
     always @ (posedge CLK100MHZ) begin // Sub in slow clock when we can
+    // make sure divider is dividing so you end up with the right time
         if (reset) begin
          seconds <= newSeconds;
          minutes <= newMinutes;
@@ -58,7 +65,7 @@ output reg [7:0]seconds
             if ( seconds < 8'b00111100 )begin // if seconds < 60, increment
                 seconds <= seconds + 8'b00000001;
                 
-            end else if (seconds >= 8'b00111100) begin
+            end if (seconds >= 8'b00111100) begin
                 seconds <= 8'b00000000; // else, seconds goes to zero, minutes increments
                 minutes <= minutes + 1;
             end
@@ -69,9 +76,13 @@ output reg [7:0]seconds
             if (hours >= 8'b00011000) begin // if 24 hours, reset hours to zero
                 hours <= 8'b00000000;
             end 
-        end     
+        end // end of else if                 
     end
- 
-    
+    // BCD conversion
+   /*
+    BCD hoursOut(.binary(hours), .tens(hoursTens), .ones(hoursOnes));
+    BCD minutesOut(.binary(minutes), .tens(minutesTens), .ones(minutesOnes));
+    BCD secondsOut(.binary(seconds), .tens(secondsTens), .ones(secondsOnes));
+   */
     
 endmodule
