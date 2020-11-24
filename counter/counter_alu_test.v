@@ -26,27 +26,28 @@ reg reset;
 reg [7:0]newSeconds;
 reg [7:0]newMinutes;
 reg [7:0]newHours;
-wire [7:0]seconds;
 wire [7:0]hours;
+wire [7:0]seconds;
 wire [7:0]minutes;
-
-counter_alu test_count(.reset(reset), .newSeconds(newSeconds), .newMinutes(newMinutes), .newHours(newHours), .seconds(seconds), .minutes(minutes), .hours(hours), .CLK100MHZ(CLK100MHZ));
+// I am so sorry this is so long
+counter_alu test_count(.reset(reset), .newSeconds(newSeconds), .newMinutes(newMinutes), .newHours(newHours), 
+.hours(hours), .minutes(minutes), .seconds(seconds),.CLK100MHZ(CLK100MHZ));
 
 initial begin
     CLK100MHZ = 0;
     newSeconds = 0;
     newMinutes = 0;
     newHours = 0;
-#10 reset = 0;
-#10 reset = 1;
-#10 reset = 0;
+    reset = 1;
+    #10 reset = 0; // waits ten seconds, set reset to zero
 end
 
 always  #5 CLK100MHZ = ~CLK100MHZ; 
 
 always begin
-newHours = 1;
-#5 {newHours, newMinutes, newSeconds } = {newHours, newMinutes, newSeconds} + 1;
+#10 {newHours, newMinutes, newSeconds } = {newHours, newMinutes, newSeconds} + 1;
+// lines up with "positive edge" of the clock
+// Toggled every 5 ns, total cycle takes 10
     if ({newHours, newMinutes, newSeconds} == 0)
       begin  $finish;
     end
