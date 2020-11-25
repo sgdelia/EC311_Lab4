@@ -47,7 +47,7 @@ output reg [7:0]seconds
     end
 always @ (*) begin // always @ * = any time anything changes, evaluate. 
     case (position) 
-        2'b00 : begin // if choosing seconds
+        2'b10 : begin // if choosing seconds
             if (add_press) begin // if button is pushed
                 if ( input_time < 59) begin
                     input_time = input_time + 1; // iterate by one if it's less than 60
@@ -89,7 +89,7 @@ always @ (*) begin // always @ * = any time anything changes, evaluate.
                 end 
             end // end else if
         end // end minutes
-        2'b10 : begin // hours
+        2'b00 : begin // hours
            if (add_press) begin // if button is pushed
                 if ( input_time < 23) begin
                     input_time = input_time + 1; // iterate by one if it's less than 24
