@@ -1,24 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 11/16/2020 10:30:56 AM
-// Design Name: 
-// Module Name: counter_alu
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module counter_alu(
 input CLK100MHZ,
@@ -52,15 +32,19 @@ output [3:0]secondsOnes
     // https://vhdlwhiz.com/create-timer/
     // https://verilogcodes.blogspot.com/2015/10/verilog-code-for-digital-clock.html
     // https://riptutorial.com/verilog/example/8307/simple-counter
+    
+    wire div_clk;
+    
+    one_s_clk div1 (.clk(CLK100MHZ), .divided_clk(div_clk));
 
-    always @ (posedge CLK100MHZ) begin // Sub in slow clock when we can
+    always @ (posedge div_clk) begin
     // make sure divider is dividing so you end up with the right time
         if (reset) begin
          seconds <= newSeconds;
          minutes <= newMinutes;
          hours <= newHours;
         end
-        else if (CLK100MHZ)begin
+        else if (div_clk)begin
         
             if ( seconds < 8'b00111100 )begin // if seconds < 60, increment
                 seconds <= seconds + 8'b00000001;
