@@ -25,23 +25,26 @@ module set_time_test(
     );
     
     reg [1:0]position;
-    reg button_press;
+    reg add_press;
+    reg sub_press;
     reg activation;
     wire [7:0]hours;
     wire [7:0]minutes;
     wire [7:0]seconds;
     
-    set_time testSetTime(.position(position), .button_press(button_press), 
+    set_time testSetTime(.position(position), .add_press(add_press), .sub_press(sub_press), 
     .hours(hours), .minutes(minutes), .seconds(seconds),
     .activation(activation));
     
     initial begin
         position = 0;
-        button_press = 0;
+        add_press = 0;
+        sub_press = 0;
         activation = 1;
         #10 activation = 0;
     end
-    always #5 button_press = ~button_press;
+    always #5 add_press = ~add_press;
+    always #150 sub_press = ~sub_press;
     always begin
     // every ten ms, change one of the inputs
     // then change position

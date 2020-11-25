@@ -1,8 +1,29 @@
 `timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 11/23/2020 06:02:00 PM
+// Design Name: 
+// Module Name: set_time
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
 
 module set_time(
 input [1:0]position,
-input button_press,
+input add_press,
+input sub_press,
 input activation,
 output reg [7:0]hours,
 output reg [7:0]minutes,
@@ -27,34 +48,67 @@ output reg [7:0]seconds
 always @ (*) begin // always @ * = any time anything changes, evaluate. 
     case (position) 
         2'b00 : begin // if choosing seconds
-            if (button_press) begin // if button is pushed
-                if ( input_time < 60)begin
+            if (add_press) begin // if button is pushed
+                if ( input_time < 59) begin
                     input_time = input_time + 1; // iterate by one if it's less than 60
                     seconds = input_time;
                     end
                 else 
                     input_time = 0; // otherwise, make her zero
-            end // end button press
+                    seconds = input_time;
+            end // end if
+            else if(sub_press) begin 
+                if (( input_time < 60) && (input_time > 0)) begin
+                    input_time = input_time - 1; // decrement by one if it's less than 24
+                    seconds = input_time;
+                end
+                else begin 
+                    input_time = 0;
+                    seconds = input_time;
+                end 
+            end // end else if
         end // end seconds 
         2'b01 : begin
-            if (button_press) begin // if button is pushed
-                if ( input_time < 60) begin
+            if (add_press) begin // if button is pushed
+                if ( input_time < 59) begin
                     input_time = input_time + 1; // iterate by one if it's less than 60
                     minutes = input_time;
                     end
                 else 
                     input_time = 0; // otherwise, make her zero
-            end // end button press
+                    minutes = input_time;
+            end // end if
+            else if(sub_press) begin 
+                if (( input_time < 60) && (input_time > 0)) begin
+                    input_time = input_time - 1; // decrement by one if it's less than 24
+                    minutes = input_time;
+                end
+                else begin 
+                    input_time = 0;
+                    minutes = input_time;
+                end 
+            end // end else if
         end // end minutes
-        2'b10 : begin
-           if (button_press) begin // if button is pushed
-                if ( input_time < 24) begin
+        2'b10 : begin // hours
+           if (add_press) begin // if button is pushed
+                if ( input_time < 23) begin
                     input_time = input_time + 1; // iterate by one if it's less than 24
                     hours = input_time;
-                    end
-                else 
-                    input_time = 0; // otherwise, make her zero
+                end
+                else
+                    input_time = 0;
+                    hours = input_time;
             end // end button press 
+            else if(sub_press) begin 
+                if (( input_time < 24) && (input_time > 0)) begin
+                input_time = input_time - 1; // decrement by one if it's less than 24
+                hours = input_time;
+                end
+                else begin 
+                    input_time = 0;
+                    hours = input_time;
+                end 
+            end // end else if   
         end // end hours
         2'b11 : begin end
     endcase // end position case
