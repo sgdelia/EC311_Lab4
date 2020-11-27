@@ -8,7 +8,8 @@ module top(
  input add_press, sub_press,
  input reset, 
  output [7:0]anode,
- output [6:0]LED_seg
+ output [6:0]LED_seg,
+ output am_pm
     );
     
     //holds the values of the set-time output
@@ -52,18 +53,31 @@ module top(
                 n_secondsTens,
                 n_secondsOnes;
  
+ //output from clock/counter to BCD module
+ wire [7:0] hours,
+            minutes,
+            seconds;   
+ 
  //24-hour clock/counter
  counter_alu clock_controller (.CLK100MHZ(CLK100MHZ),
                                .reset(reset),
                                .newHours(n_hours), 
                                .newMinutes(n_minutes), 
                                .newSeconds(n_seconds),
-                               .hoursTens(hoursTens),
-                               .hoursOnes(hoursOnes),
-                               .minutesTens(minutesTens),
-                               .minutesOnes(minutesOnes),
-                               .secondsTens(secondsTens),
-                               .secondsOnes(secondsOnes));
+                               .hours(hours),
+                               .minutes(minutes),
+                               .seconds(seconds));
+  
+                            
+ //holds unused hundreds position values from BCD conversion   
+    wire [3:0]h_hundreds,
+              m_hundreds,
+              s_hundreds;
+              
+    // BCD conversion for 24-hour clock          
+    BCD hoursOut(.binary(hours),.hundreds(h_hundreds), .tens(hoursTens), .ones(hoursOnes));
+    BCD minutesOut(.binary(minutes), .hundreds(m_hundreds), .tens(minutesTens), .ones(minutesOnes));
+    BCD secondsOut(.binary(seconds), .hundreds(s_hundreds), .tens(secondsTens), .ones(secondsOnes));
  
  //holds the output of debounced buttons
  wire add,
@@ -83,6 +97,19 @@ module top(
                             .hours(n_hours),
                             .minutes(n_minutes),
                             .seconds(n_seconds));
+  
+  //output from 12-hour conversion
+  wire [7:0] twelve_hour_out;
+  //holds twelve hour BCD conversion output
+  wire [3:0] twelve_hour_hundreds,
+             twelve_hour_tens,
+             twelve_hour_ones;
+  
+  //convert to 12-hour
+  twelve_hour twelve_hour_convert (.hours(hours), .am_pm(am_pm), .twelve_hour_out(twelve_hour_out));
+  
+  //convert 12 hour to BCD
+  BCD twelve_hour_BCD (.binary(twelve_hour_out), .hundreds(twelve_hour_hundreds), .tens(twelve_hour_tens), .ones(twelve_hour_ones)); 
   
 always @(*) //change input to the seven-segment display based on the mode
 begin
@@ -116,8 +143,8 @@ begin
         end
      2'b11: //if in 12-hour display mode
         begin
-        digit2 <= hoursTens;
-        digit3 <= hoursOnes;
+        digit2 <= twelve_hour_tens;
+        digit3 <= twelve_hour_ones;
         digit4 <= minutesTens;
         digit5 <= minutesOnes;
         digit6 <= secondsTens;

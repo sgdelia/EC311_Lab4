@@ -6,23 +6,23 @@ input [7:0]newHours, // used for setting time
 input [7:0]newSeconds, // used for setting time
 input [7:0]newMinutes, // used for setting time
 input reset, // Used for initializing at zero
-//output reg [7:0]hours,
-//output reg [7:0]minutes,
-//output reg [7:0]seconds
+output reg [7:0]hours,
+output reg [7:0]minutes,
+output reg [7:0]seconds
 // outputs answer in BCD; uncomment lines 29-31 for 8-bit output
-
+/*
 output [3:0]hoursTens,
 output [3:0]hoursOnes,
 output [3:0]minutesTens,
 output [3:0]minutesOnes,
 output [3:0]secondsTens,
 output [3:0]secondsOnes
-
+*/
     );
     
-   reg [7:0]seconds;
-   reg [7:0]minutes;
-   reg [7:0]hours;
+   //reg [7:0]seconds;
+   //reg [7:0]minutes;
+   //reg [7:0]hours;
         
     // counts until 24:60:60
     // 8 bit in/out so it's compatible with the ALU
@@ -62,16 +62,6 @@ output [3:0]secondsOnes
             end 
         end // end of else if                 
     end
-    
-    //holds unused hundreds position values from BCD conversion   
-    wire [3:0] h_hundreds,
-              m_hundreds,
-              s_hundreds;
-              
-    // BCD conversion          
-    BCD hoursOut(.binary(hours),.hundreds(h_hundreds), .tens(hoursTens), .ones(hoursOnes));
-    BCD minutesOut(.binary(minutes), .hundreds(m_hundreds), .tens(minutesTens), .ones(minutesOnes));
-    BCD secondsOut(.binary(seconds), .hundreds(s_hundreds), .tens(secondsTens), .ones(secondsOnes));
    
     
 endmodule
