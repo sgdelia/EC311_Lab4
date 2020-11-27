@@ -6,24 +6,24 @@ input [7:0]newHours, // used for setting time
 input [7:0]newSeconds, // used for setting time
 input [7:0]newMinutes, // used for setting time
 input reset, // Used for initializing at zero
-output reg [7:0]hours,
-output reg [7:0]minutes,
-output reg [7:0]seconds
+//output reg [7:0]hours,
+//output reg [7:0]minutes,
+//output reg [7:0]seconds
 // outputs answer in BCD; uncomment lines 29-31 for 8-bit output
-/*
+
 output [3:0]hoursTens,
 output [3:0]hoursOnes,
 output [3:0]minutesTens,
 output [3:0]minutesOnes,
 output [3:0]secondsTens,
 output [3:0]secondsOnes
-*/
+
     );
-   /* 
+    
    reg [7:0]seconds;
    reg [7:0]minutes;
    reg [7:0]hours;
-   */     
+        
     // counts until 24:60:60
     // 8 bit in/out so it's compatible with the ALU
     // Eventually, this is going to use the add 1 function from the ALU. Until then, I'm just adding one so we have 
@@ -49,24 +49,24 @@ output [3:0]secondsOnes
             if ( seconds < 8'b00111100 )begin // if seconds < 60, increment
                 seconds <= seconds + 8'b00000001;
                 
-            end if (seconds >= 8'b00111100) begin
+            end if (seconds >= 8'b00111011) begin
                 seconds <= 8'b00000000; // else, seconds goes to zero, minutes increments
                 minutes <= minutes + 1;
             end
-            if (minutes >= 8'b00111100) begin // If minutes = 60, reset to zero, increment hours
+            if ((minutes >= 8'b00111011) && (seconds>=8'b00111011)) begin  // If minutes >59 & seconds >59 , reset to zero, increment hours
                 minutes <= 8'b00000000;
                 hours <= hours + 1;
             end
-            if (hours >= 8'b00011000) begin // if 24 hours, reset hours to zero
+            if (hours >= 8'b00011000) begin // if >23 hours, reset hours to zero
                 hours <= 8'b00000000;
             end 
         end // end of else if                 
     end
     // BCD conversion
-   /*
+   
     BCD hoursOut(.binary(hours), .tens(hoursTens), .ones(hoursOnes));
     BCD minutesOut(.binary(minutes), .tens(minutesTens), .ones(minutesOnes));
     BCD secondsOut(.binary(seconds), .tens(secondsTens), .ones(secondsOnes));
-   */
+   
     
 endmodule
