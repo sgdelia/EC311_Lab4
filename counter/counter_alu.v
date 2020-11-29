@@ -5,24 +5,24 @@ input CLK100MHZ,
 input [7:0]newHours, // used for setting time
 input [7:0]newSeconds, // used for setting time
 input [7:0]newMinutes, // used for setting time
-input reset, // Used for initializing at zero
-//output reg [7:0]hours,
-//output reg [7:0]minutes,
-//output reg [7:0]seconds
+input set, // Used for setting time
+output reg [7:0]hours,
+output reg [7:0]minutes,
+output reg [7:0]seconds
 // outputs answer in BCD; uncomment lines 29-31 for 8-bit output
-
+/*
 output [3:0]hoursTens,
 output [3:0]hoursOnes,
 output [3:0]minutesTens,
 output [3:0]minutesOnes,
 output [3:0]secondsTens,
 output [3:0]secondsOnes
-
+*/
     );
     
-   reg [7:0]seconds;
-   reg [7:0]minutes;
-   reg [7:0]hours;
+   //reg [7:0]seconds;
+   //reg [7:0]minutes;
+   //reg [7:0]hours;
         
     // counts until 24:60:60
     // 8 bit in/out so it's compatible with the ALU
@@ -33,13 +33,25 @@ output [3:0]secondsOnes
     // https://verilogcodes.blogspot.com/2015/10/verilog-code-for-digital-clock.html
     // https://riptutorial.com/verilog/example/8307/simple-counter
     
-    wire div_clk;
+    wire div_clk,
+         c_out_s,
+         c_out_m,
+         c_out_h;
+         
+    wire [7:0] next_second,
+               next_minute,
+               next_hour;
     
     one_s_clk div1 (.clk(CLK100MHZ), .divided_clk(div_clk));
-
+   
+    plus_one plus_second (.a(seconds), .out(next_second), .cout(c_out_s));
+    plus_one plus_minute (.a(minutes), .out(next_minute), .cout(c_out_m));
+    plus_one plus_hour (.a(hours), .out(next_hour), .cout(c_out_h));
+   
+    
     always @ (posedge div_clk) begin
     // make sure divider is dividing so you end up with the right time
-        if (reset) begin
+        if (set) begin
          seconds <= newSeconds;
          minutes <= newMinutes;
          hours <= newHours;
@@ -47,26 +59,21 @@ output [3:0]secondsOnes
         else if (div_clk)begin
         
             if ( seconds < 8'b00111100 )begin // if seconds < 60, increment
-                seconds <= seconds + 8'b00000001;
+                seconds <= next_second;
                 
             end if (seconds >= 8'b00111011) begin
                 seconds <= 8'b00000000; // else, seconds goes to zero, minutes increments
-                minutes <= minutes + 1;
+                minutes <= next_minute;
             end
             if ((minutes >= 8'b00111011) && (seconds>=8'b00111011)) begin  // If minutes >59 & seconds >59 , reset to zero, increment hours
                 minutes <= 8'b00000000;
-                hours <= hours + 1;
+                hours <= next_hour;
             end
             if (hours >= 8'b00011000) begin // if >23 hours, reset hours to zero
                 hours <= 8'b00000000;
             end 
         end // end of else if                 
     end
-    // BCD conversion
-   
-    BCD hoursOut(.binary(hours), .tens(hoursTens), .ones(hoursOnes));
-    BCD minutesOut(.binary(minutes), .tens(minutesTens), .ones(minutesOnes));
-    BCD secondsOut(.binary(seconds), .tens(secondsTens), .ones(secondsOnes));
    
     
 endmodule
