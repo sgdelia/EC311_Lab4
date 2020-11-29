@@ -30,6 +30,6 @@ module plus_one(
     assign one = 8'b00000001;
     assign cin = 0;
     
-    cla_adder plus1 (.a(a),.b(one),.c_in(cin), .c_out(cout), .sum(out));
+    cla_adder plus1 (.a(a),.b(one), .c_in(cin), .c_out(cout), .sum(out));
     
 endmodule
